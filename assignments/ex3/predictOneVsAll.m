@@ -8,13 +8,14 @@ function p = predictOneVsAll(all_theta, X)
 %  of values from 1..K (e.g., p = [1; 3; 1; 2] predicts classes 1, 3, 1, 2
 %  for 4 examples) 
 
-m = size(X, 1);
-num_labels = size(all_theta, 1);
+[m, n] = size(X)
+[num_labels,a_t_2] = size(all_theta) %k, n+1
+
 
 % You need to return the following variables correctly 
-p = zeros(size(X, 1), 1);
+p = zeros(m, 1);
 
-% Add ones to the X data matrix
+% Add ones to the X data matrix so that X is m,n+1
 X = [ones(m, 1) X];
 
 % ====================== YOUR CODE HERE ======================
@@ -30,24 +31,23 @@ X = [ones(m, 1) X];
 %       for each row.
 %       
 
+% m = number of examples, n = number of features, k = number of classes
 % all_theta is kX(n + 1)
 % X is mX(n + 1)
 % p is mX1
 % we want p to be a vector where every row is the classification for that
 % row from X.
-% we calculate the classification for  by making a new vector for
-% each example, where the value at row j is all_theta(
-
-% all_theta(i,:) * X(j,:)'
-
-for j=1:m
-    temp = all_theta(i,:) * X(j,:)';
-    p(j) = temp
+% we calculate the classification for each example i by making a new 
+% vector temp = (kX1) for each example, where the value at row j is the 
+% probability that i is in class j.
+% then we set p(i) to be the max of vector temp, and repeat for every i in
+% 1:m
+temp = zeros(m,num_labels);
+for i=1:num_labels
+    temp(:,i) = X * all_theta(i,:)'; % the result is a mX(n+1) vector
 end
 
-indices = max(all_theta, [], 2);
-p = mod(indices, 10); % compute mod 10 for each number, so that '10' becomes 0
-
+[~, p] = max(temp, [], 2)
 
 % =========================================================================
 
