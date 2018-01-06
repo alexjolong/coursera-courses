@@ -65,26 +65,53 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-X = [ones(m,1), X];
+X = [ones(m,1), X]; % add our bias at a1(0) for all training examples
+% Theta1 and Theta1_grad are 25x401
+% Theta2 and Theta2_grad are 10x26
 
 for i = 1:m
-    x = X(i,:)'; % x is 401 x 1
-    inputsToHiddenLayer = Theta1 * x; % result is 25 x 1
-    hiddenLayerActivation = sigmoid(inputsToHiddenLayer);
-    inputsToOutputLayer = Theta2 * [1; hiddenLayerActivation]; 
-    % result is 10 x 1
-    hOfX = sigmoid(inputsToOutputLayer);
+    a1 = X(i,:)'; % a1 is our input for one example. a 401 x 1 vector
+    z2 = Theta1 * a1; % result is 25 x 1
+    a2 = [1; sigmoid(z2)]; % added bias at a2(0)
+    % we need to add a bias value to Theta2
+    z3 = Theta2 * a2; % result is 10 x 1
+    a3 = sigmoid(z3);
 
+    % newY is 10 x 1, with a 1 in the slot corresponding to the digit given
+    % by y(i) (which is the digit shown in x(i,:))
     newY = zeros(K, 1);
-    newY(y(i)) = 1; %newY is 10 x 1, with a 1 in the slot corresponding to 
-    % the digit given by y(i) (which is the digit shown in x(i,:))
+    newY(y(i)) = 1; 
     
-    % perform element-wise multiplication on y and log(hOfX) to get a
-    % vector of errors
-    term1 = (-newY) .* log(hOfX);
-    term2 = (1 - newY) .* log(1 - hOfX);
+    % delta3 is a 10 x 1 vector which is the error between our estimate and
+    % the actual answer for this training example.
+    delta3 = (a3 - newY); 
+    
+    % we don't want to update the bias in our backpropogation, so we drop
+    % the first element of the first term (which corresponds to the first
+    % row of Theta2' -- our output layer bias weights.
+    % delta2 is 26x10 * 10x1 = 26x1 .* 26x1 = 26x1
+    % we add a bias to keep the dimensions consistent when multiplying, but
+    % we won't use it for calculations later.
+    delta2 = (Theta2' * delta3) .* [1; sigmoidGradient(z2)];
+    delta2 = delta2(2:end);
+    % there is no delta1, because the first layer should have no error
+    
+    % Compute the cost J
+    term1 = (-newY) .* log(a3);
+    term2 = (1 - newY) .* log(1 - a3);
     innerSum = sum(term1 - term2);    
     J = J + innerSum;
+    
+    % accumulate Delta (the partial derivative of the cost function with
+    % respect to Theta1 and Theta 2
+    % Theta2_grad is 10x1 * 1x26 = 10 x 26
+    % we want Theta2_grad to be 10x26
+    Theta2_grad = Theta2_grad + (delta3 * a2');
+    
+    % Theta1_grad is 25 x 1 * 1 x 401 = 25 x 401
+    % we want Theta1_grad to be 25x401
+    Theta1_grad = Theta1_grad + (delta2 * a1');
+    
 end
 
 regTerm1 = sum(sum(Theta1(:, 2:end).^2));
@@ -93,13 +120,18 @@ reg = lambda * (regTerm1 + regTerm2) / (2 * m);
 
 J = (J / m) + reg;
 
-
-
-
-
-
+Theta1_grad = Theta1_grad / m;
+Theta2_grad = Theta2_grad / m;
 
 % -------------------------------------------------------------
+
+
+for t=1:m
+    
+    
+end
+
+
 
 % =========================================================================
 
