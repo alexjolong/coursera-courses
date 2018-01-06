@@ -120,8 +120,12 @@ reg = lambda * (regTerm1 + regTerm2) / (2 * m);
 
 J = (J / m) + reg;
 
-Theta1_grad = Theta1_grad / m;
-Theta2_grad = Theta2_grad / m;
+regTheta1 = Theta1;
+regTheta2 = Theta2;
+regTheta1(:, 1) = zeros(size(Theta1,1),1);
+regTheta2(:, 1) = zeros(size(Theta2,1),1);
+Theta1_grad = (Theta1_grad / m) + ((lambda/m) * regTheta1);
+Theta2_grad = (Theta2_grad / m) + ((lambda/m) * regTheta2);
 
 % -------------------------------------------------------------
 
