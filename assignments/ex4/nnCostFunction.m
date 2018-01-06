@@ -65,7 +65,7 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-X = [ones(5000,1), X];
+X = [ones(m,1), X];
 
 for i = 1:m
     x = X(i,:)'; % x is 401 x 1
@@ -87,7 +87,11 @@ for i = 1:m
     J = J + innerSum;
 end
 
-J = J / m;
+regTerm1 = sum(sum(Theta1(:, 2:end).^2));
+regTerm2 = sum(sum(Theta2(:, 2:end).^2));
+reg = lambda * (regTerm1 + regTerm2) / (2 * m);
+
+J = (J / m) + reg;
 
 
 
