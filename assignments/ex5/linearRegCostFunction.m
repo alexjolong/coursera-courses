@@ -26,13 +26,20 @@ grad = zeros(size(theta));
 h = bsxfun(@times,X,theta'); % this may be a little faster than a loop
 h = sum(h,2); % returns a column vector of the sums of each row
 J = (1/(2*m)) * sum((h - y).^2);
-
+% now for regularization
 regTheta = theta;
 regTheta(1) = 0;
 reg = (lambda / (2 * m)) * sum(regTheta.^2);
-
+% put it all together
 J = J + reg;
 
+% now for the gradient. reuse h(X)
+
+% grad is a row vector where each entry i represents the partial derivative
+% of the cost function with respect to theta[i].
+grad = (1/m) * sum(bsxfun(@times,X,(h - y)), 1);
+% we can reuse our 'regTheta' vector from before.
+grad = grad' + ((lambda / m)*regTheta);
 % =========================================================================
 
 grad = grad(:);
