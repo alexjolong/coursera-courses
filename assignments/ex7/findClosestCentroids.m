@@ -30,7 +30,7 @@ for i=1:m
     end
     
     [m,ind] = min(distances);
-    idx(i) = ind
+    idx(i) = ind;
 end
 
 
